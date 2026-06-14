@@ -1,0 +1,427 @@
+﻿<Window x:Class="CarRentals.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CarRentals" xmlns:xctk="http://schemas.xceed.com/wpf/xaml/toolkit"
+        mc:Ignorable="d"
+        Title="Каршеринг" 
+        Icon="/res/wdwdwdw.jpg"
+        Height="650" Width="1100">
+
+    <Window.Resources>
+        <Style TargetType="TextBlock">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <Style TargetType="ComboBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <Style TargetType="ListBox">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <Style TargetType="DatePicker">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+
+        <Style TargetType="TabItem">
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Grid.Row="0" 
+           Text="СИСТЕМА АРЕНДЫ АВТОМОБИЛЕЙ"
+           FontSize="24" FontWeight="Bold"
+           Background="#0000CD" Foreground="White"
+           Padding="15" TextAlignment="Center"
+           Margin="0,0,0,10"/>
+
+        <TabControl Grid.Row="1">
+
+            <!--автомобили-->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/res/avto.jpg" Width="20" Height="20" Margin="0,0,5,0"/>
+                        <TextBlock Text="Автомобили" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="5">
+                        <TextBlock Text="Список автомобилей" FontWeight="Bold" FontSize="14"/>
+                        <ListBox x:Name="lstCars" Height="400" Margin="0,5,0,5" 
+                                 SelectionChanged="LstCars_SelectionChanged"
+                                 DisplayMemberPath="Brand"/>
+                        <Button x:Name="btnRefreshCars" Content="Обновить" Margin="0,5" Click="BtnRefreshCars_Click"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5">
+                        <TextBlock Text="Редактирование автомобиля" FontWeight="Bold" FontSize="14"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Марка:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtBrand" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Модель:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtModel" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Год выпуска:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtYearCar" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Госномер:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtLicensePlate" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Коробка передач:" Width="150" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbTransmissionType" Width="200">
+                                <ComboBoxItem Content="Механика"/>
+                                <ComboBoxItem Content="Автомат"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Цена за час:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtPricePerHour" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Цена за день:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtPricePerDay" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Статус:" Width="150" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbCarStatus" Width="200">
+                                <ComboBoxItem Content="Доступен"/>
+                                <ComboBoxItem Content="Арендован"/>
+                                <ComboBoxItem Content="На обслуживании"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Center">
+
+                            <Button x:Name="btnAddCar" Click="BtnAddCar_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/res/add.jpg" Width="20" Height="20" Margin="0,0,5,0"/>
+                                    <TextBlock Text="Добавить"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="btnUpdateCar" Content="Обновить" Background="Orange" Foreground="White" Width="100" Margin="5,0" Click="BtnUpdateCar_Click"/>
+                            <Button x:Name="btnDeleteCar" Content="Удалить" Background="Red" Foreground="White" Width="100" Margin="5,0,0,0" Click="BtnDeleteCar_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!-- бронирования-->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/res/bron.jpg" Width="20" Height="20" Margin="0,0,5,0"/>
+                        <TextBlock Text="Бронирования" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="5">
+                        <TextBlock Text="Список бронирований" FontWeight="Bold" FontSize="14"/>
+                        <ListBox x:Name="lstBookings" Height="400" Margin="0,5,0,5" 
+                                 SelectionChanged="LstBookings_SelectionChanged" DisplayMemberPath="Brand"/>
+                        <Button x:Name="btnRefreshBookings" Content="Обновить" Margin="0,5" Click="BtnRefreshBookings_Click"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5">
+                        <TextBlock Text="Редактирование бронирования" FontWeight="Bold" FontSize="14"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Автомобиль:" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbCarForBooking" Width="200" 
+                           DisplayMemberPath="CarDisplay" 
+                           SelectedValuePath="CarId"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Пользователь:" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbUserForBooking" Width="200" 
+                           DisplayMemberPath="UserDisplay" 
+                           SelectedValuePath="UserId"/>
+                        </StackPanel>
+
+                        <!-- DateTimePicker для даты и времени начала -->
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Начало аренды:" Width="120" VerticalAlignment="Center"/>
+                            <xctk:DateTimePicker x:Name="dpStartDateTime" 
+                                                  Format="Custom" 
+                                                  FormatString="dd.MM.yyyy HH:mm"
+                                                  TimeFormat="Custom"
+                                                  TimeFormatString="HH:mm"
+                                                  Width="200"/>
+                        </StackPanel>
+
+                        <!-- DateTimePicker для даты и времени окончания -->
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Конец аренды:" Width="120" VerticalAlignment="Center"/>
+                            <xctk:DateTimePicker x:Name="dpEndDateTime" 
+                                                  Format="Custom" 
+                                                  FormatString="dd.MM.yyyy HH:mm"
+                                                  TimeFormat="Custom"
+                                                  TimeFormatString="HH:mm"
+                                                  Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Итоговая цена:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtTotalPrice" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Статус:" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbBookingStatus" Width="200">
+                                <ComboBoxItem Content="Активно"/>
+                                <ComboBoxItem Content="Завершено"/>
+                                <ComboBoxItem Content="Отменено"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Пробег (км):" Width="120" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtMileage" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Причина отмены:" Width="120" VerticalAlignment="Top"/>
+                            <TextBox x:Name="txtCancellationReason" Width="200" Height="50" TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Center">
+                            <Button x:Name="btnAddBooking" Content="Добавить" Background="Green" Foreground="White" Width="100" Margin="0,0,5,0" Click="BtnAddBooking_Click"/>
+                            <Button x:Name="btnUpdateBooking" Content="Обновить" Background="Orange" Foreground="White" Width="100" Margin="5,0" Click="BtnUpdateBooking_Click"/>
+                            <Button x:Name="btnDeleteBooking" Content="Удалить" Background="Red" Foreground="White" Width="100" Margin="5,0,0,0" Click="BtnDeleteBooking_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!--штрафы -->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/res/shtraf.jpg" Width="20" Height="20" Margin="0,0,5,0"/>
+                        <TextBlock Text="Штрафы" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="5">
+                        <TextBlock Text="Список штрафов" FontWeight="Bold" FontSize="14"/>
+                        <ListBox x:Name="lstFines" Height="400" Margin="0,5,0,5" 
+                                 SelectionChanged="LstFines_SelectionChanged"/>
+                        <Button x:Name="btnRefreshFines" Content="Обновить" Margin="0,5" Click="BtnRefreshFines_Click"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5">
+                        <TextBlock Text="Редактирование штрафа" FontWeight="Bold" FontSize="14"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Тип штрафа:" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbFineType" Width="200">
+                                <ComboBoxItem Content="Превышение скорости"/>
+                                <ComboBoxItem Content="Неправильная парковка"/>
+                                <ComboBoxItem Content="Проезд на красный"/>
+                                <ComboBoxItem Content="Повреждение авто"/>
+                                <ComboBoxItem Content="Другое"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Сумма:" Width="120" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtAmount" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Причина:" Width="120" VerticalAlignment="Top"/>
+                            <TextBox x:Name="txtReason" Width="200" Height="60" TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <!-- DateTimePicker для даты выдачи штрафа -->
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Дата выдачи:" Width="120" VerticalAlignment="Center"/>
+                            <xctk:DateTimePicker x:Name="dpIssueDate" 
+                                                  Format="Custom" 
+                                                  FormatString="dd.MM.yyyy HH:mm"
+                                                  TimeFormat="Custom"
+                                                    TimeFormatString="HH:mm"
+                                                  Width="200"/>
+                        </StackPanel>
+
+                        <!-- DateTimePicker для даты оплаты -->
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Дата оплаты:" Width="120" VerticalAlignment="Center"/>
+                            <xctk:DateTimePicker x:Name="dpPaymentDate" 
+                                                  Format="Custom" 
+                                                  FormatString="dd.MM.yyyy HH:mm"
+                                                  TimeFormat="Custom"
+                                                  TimeFormatString="HH:mm"
+                                                  Width="200"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Статус:" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbFineStatus" Width="200">
+                                <ComboBoxItem Content="Оплачен"/>
+                                <ComboBoxItem Content="Не оплачен"/>
+                            </ComboBox>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Бронирование:" Width="120" VerticalAlignment="Center"/>
+                            <ComboBox x:Name="cmbBookingForFine" Width="200" DisplayMemberPath="BookingId"/>
+                        </StackPanel>
+                        <Border Background="#FFF0F0F0" BorderBrush="#CCCCCC" BorderThickness="1" 
+                        CornerRadius="5" Margin="0,10" Padding="10">
+                            <StackPanel>
+                                <TextBlock Text="Информация о бронировании:" FontWeight="Bold" Margin="0,0,0,5"/>
+                                <TextBlock x:Name="txtBookingPeriod" Foreground="Gray" FontSize="11" TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Center">
+                            <Button x:Name="btnAddFine" Content="Добавить" Background="Green" Foreground="White" Width="100" Margin="0,0,5,0" Click="BtnAddFine_Click"/>
+                            <Button x:Name="btnUpdateFine" Content="Обновить" Background="Orange" Foreground="White" Width="100" Margin="5,0" Click="BtnUpdateFine_Click"/>
+                            <Button x:Name="btnDeleteFine" Content="Удалить" Background="Red" Foreground="White" Width="100" Margin="5,0,0,0" Click="BtnDeleteFine_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+
+            <!--Пользователи-->
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/res/user.jpg" Width="20" Height="20" Margin="0,0,5,0"/>
+                        <TextBlock Text="Пользователи" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </TabItem.Header>
+                <Grid Margin="10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Margin="5">
+                        <TextBlock Text="Список пользователей" FontWeight="Bold" FontSize="14"/>
+                        <ListBox x:Name="lstUsers" Height="400" Margin="0,5,0,5" 
+                     SelectionChanged="LstUsers_SelectionChanged"
+                     DisplayMemberPath="LastName"/>
+                        <Button x:Name="btnRefreshUsers" Content="Обновить" Margin="0,5" Click="BtnRefreshUsers_Click"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="5">
+                        <TextBlock Text="Редактирование пользователя" FontWeight="Bold" FontSize="14"/>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="ID:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtUserId" Width="200" IsReadOnly="True" Background="LightGray"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Фамилия:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtLastName" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Email:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtEmail" Width="200"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Кол-во бронирований:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtBookingsCount" Width="200" IsReadOnly="True" Background="LightGray"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,5">
+                            <TextBlock Text="Сумма штрафов:" Width="150" VerticalAlignment="Center"/>
+                            <TextBox x:Name="txtTotalFines" Width="200" IsReadOnly="True" Background="LightGray"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,10" HorizontalAlignment="Center">
+                            <Button x:Name="btnAddUser" Click="BtnAddUser_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <Image Source="/res/add.jpg" Width="20" Height="20" Margin="0,0,5,0"/>
+                                    <TextBlock Text="Добавить"/>
+                                </StackPanel>
+                            </Button>
+                            <Button x:Name="btnUpdateUser" Content="Обновить" Background="Orange" Foreground="White" Width="100" Margin="5,0" Click="BtnUpdateUser_Click"/>
+                            <Button x:Name="btnDeleteUser" Content="Удалить" Background="Red" Foreground="White" Width="100" Margin="5,0,0,0" Click="BtnDeleteUser_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+            <!--статистика-->
+            <TabItem Header="Статистика">
+                <Grid Margin="10">
+                    <DataGrid x:Name="dgStats" 
+                              AutoGenerateColumns="False" 
+                              IsReadOnly="True" 
+                              Margin="0,5"
+                              Height="450">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Binding="{Binding CarId}" Width="50"/>
+                            <DataGridTextColumn Header="Автомобиль" Binding="{Binding CarName}" Width="150"/>
+                            <DataGridTextColumn Header="Кол-во броней" Binding="{Binding BookingsCount}" Width="100"/>
+                            <DataGridTextColumn Header="Доход" Binding="{Binding TotalRevenue}" Width="120"/>
+                            <DataGridTextColumn Header="Кол-во штрафов" Binding="{Binding FinesCount}" Width="100"/>
+                            <DataGridTextColumn Header="Сумма штрафов" Binding="{Binding TotalFinesAmount}" Width="120"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
+</Window>

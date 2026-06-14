@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="res\add.jpg" />
+    <None Remove="res\avto.jpg" />
+    <None Remove="res\bron.jpg" />
+    <None Remove="res\shtraf.jpg" />
+    <None Remove="res\user.jpg" />
+    <None Remove="res\wdwdwdw.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Extended.Wpf.Toolkit" Version="5.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.10" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="res\add.jpg" />
+    <Resource Include="res\avto.jpg" />
+    <Resource Include="res\bron.jpg" />
+    <Resource Include="res\shtraf.jpg" />
+    <Resource Include="res\user.jpg" />
+    <Resource Include="res\wdwdwdw.jpg" />
+  </ItemGroup>
+
+</Project>
