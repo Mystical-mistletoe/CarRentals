@@ -76,9 +76,15 @@ namespace CarRentals
         /// </summary>
         private void LoadCars()
         {
-            db.Cars.Load();
-            lstCars.ItemsSource = db.Cars.Local.ToObservableCollection();
-            lstCars.DisplayMemberPath = "Brand"; //что показывать в списке
+
+            // Загружаем свежие данные из БД
+            var cars = db.Cars.ToList();
+
+            // Создаем НОВУЮ ObservableCollection
+            lstCars.ItemsSource = null;  // сначала сбрасываем
+
+            lstCars.ItemsSource = cars;
+            lstCars.DisplayMemberPath = "Brand";
         }
 
         private void UpdateCarStatusBasedOnBookings(int carId)
@@ -192,6 +198,7 @@ namespace CarRentals
                 LoadStatistics();
 
                 LoadCars();
+                ClearCarFields();
                 MessageBox.Show("Автомобиль обновлен");
             }
             else
