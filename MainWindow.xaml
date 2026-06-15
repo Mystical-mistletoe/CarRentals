@@ -212,7 +212,7 @@
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">
                             <TextBlock Text="Итоговая цена:" Width="120" VerticalAlignment="Center"/>
-                            <TextBox x:Name="txtTotalPrice" Width="200"/>
+                            <TextBox x:Name="txtTotalPrice" Width="200" IsReadOnly="True"/>
                         </StackPanel>
 
                         <StackPanel Orientation="Horizontal" Margin="0,5">

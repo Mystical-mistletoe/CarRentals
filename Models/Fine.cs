@@ -27,5 +27,22 @@ namespace CarRentals.Models
         public Booking Booking { get; set; } = null!;
 
         public DateTime CreatedAt { get; set; }
+
+        public string DisplayName => $"{GetFineTypeName()} — {IssueDate:dd.MM.yyyy HH:mm} — {Booking?.User?.LastName}";
+
+        private string GetFineTypeName()
+        {
+            switch (FineType)
+            {
+                case FineType.Speeding: return "Превышение скорости";
+                case FineType.Parking: return "Неправильная парковка";
+                case FineType.WrongRed: return "Проезд на красный";
+                case FineType.Damage: return "Повреждение авто";
+                case FineType.Another: return "Другое";
+                default: return FineType.ToString();
+            }
+        }
     }
 }
+
+    

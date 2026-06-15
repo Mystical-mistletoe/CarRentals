@@ -30,5 +30,6 @@ namespace CarRentals.Models
         //в лист бокс
         public string StartDateOnly => StartDateTime.ToString("dd.MM.yyyy");
 
+        public string DisplayName => $"#{BookingId} — {Car?.Brand} {Car?.Model} — {User?.LastName} ({StartDateTime:dd.MM.yyyy HH:mm})";
     }
 }

@@ -34,6 +34,11 @@ namespace CarRentals
             // Подписываемся на событие выбора бронирования для штрафа
             cmbBookingForFine.SelectionChanged += CmbBookingForFine_SelectionChanged;
 
+            // Подписываемся на события для автоматического пересчёта
+            dpStartDateTime.ValueChanged += DpStartDateTime_ValueChanged;
+            dpEndDateTime.ValueChanged += DpEndDateTime_ValueChanged;
+            cmbCarForBooking.SelectionChanged += CmbCarForBooking_SelectionChanged;
+
             // Менеджер может добавлять бронирования и штрафы
             if (CurrentAccount.CurAccount.Role == "manager")
             {
@@ -428,7 +433,7 @@ namespace CarRentals
             db.Bookings.Include(b => b.Car).Include(b => b.User).Load(); //загруж связанных
             var bookingsList = db.Bookings.Local.ToObservableCollection();
             lstBookings.ItemsSource = bookingsList;
-            lstBookings.DisplayMemberPath = "StartDateOnly";
+            lstBookings.DisplayMemberPath = "DisplayName";
         }
 
         private void LstBookings_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -473,6 +478,133 @@ namespace CarRentals
             return !conflictingBookings.Any();
         }
 
+        /// <summary>
+        /// Рассчитывает стоимость аренды в зависимости от длительности (поминутно) и цен автомобиля
+        /// Минимальное время аренды — 30 минут
+        /// </summary>
+        private decimal CalculateRentalCost(int carId, DateTime startDate, DateTime endDate)
+        {
+            // Находим автомобиль в базе данных
+            var car = db.Cars.Find(carId);
+            if (car == null) return 0;
+
+            // Проверяем, что дата окончания позже даты начала
+            if (endDate <= startDate) return 0;
+
+            // Вычисляем длительность аренды в минутах
+            TimeSpan duration = endDate - startDate;
+            double totalMinutes = duration.TotalMinutes;
+
+            // Минимальная длительность аренды — 20 минут
+            if (totalMinutes < 20)
+            {
+                MessageBox.Show("Минимальное время аренды — 20 минут", "Предупреждение",
+                                MessageBoxButton.OK, MessageBoxImage.Warning);
+                return 0;
+            }
+
+            // Округляем минуты до целого значения
+            int minutesToPay = (int)Math.Ceiling(totalMinutes);
+
+            // Рассчитываем стоимость: (минуты / 60) * цена_за_час
+            // Но точнее: цена_за_час / 60 * минуты
+            decimal pricePerMinute = car.PricePerHour / 60;
+            decimal totalCost = pricePerMinute * minutesToPay;
+
+            // Проверяем, не выгоднее ли посуточный тариф
+            // Если аренда больше 23 часов, возможно, сутки будут дешевле
+            if (totalMinutes >= 23 * 60) // 23 часа и более
+            {
+                int totalDays = (int)Math.Floor(totalMinutes / (24 * 60));
+                double remainingMinutes = totalMinutes % (24 * 60);
+
+                decimal dailyCost = totalDays * car.PricePerDay;
+
+                if (remainingMinutes > 0)
+                {
+                    decimal remainingCost = (car.PricePerHour / 60) * (decimal)remainingMinutes;
+                    dailyCost += remainingCost;
+                }
+
+                // Если посуточный тариф выгоднее — используем его
+                if (dailyCost < totalCost)
+                    totalCost = dailyCost;
+            }
+
+            // Округляем до двух знаков после запятой
+            return Math.Round(totalCost, 2);
+        }
+
+        /// <summary>
+        /// Основной метод пересчёта стоимости (вызывается при изменении дат или выборе авто)
+        /// </summary>
+        private void RecalculateTotalPrice()
+        {
+            // Проверяем, выбран ли автомобиль
+            if (cmbCarForBooking.SelectedValue == null)
+            {
+                txtTotalPrice.Text = "";
+                return;
+            }
+
+            // Получаем дату и время из DateTimePicker
+            DateTime? startDateTime = dpStartDateTime.Value;
+            DateTime? endDateTime = dpEndDateTime.Value;
+
+            // Проверяем, что даты указаны
+            if (startDateTime == null || endDateTime == null)
+            {
+                txtTotalPrice.Text = "";
+                return;
+            }
+
+            // Проверяем, что дата окончания позже даты начала
+            if (endDateTime.Value <= startDateTime.Value)
+            {
+                txtTotalPrice.Text = "Ошибка: дата окончания должна быть позже даты начала";
+                return;
+            }
+
+            // Проверяем минимальную длительность (20 минут)
+            TimeSpan duration = endDateTime.Value - startDateTime.Value;
+            if (duration.TotalMinutes < 20)
+            {
+                txtTotalPrice.Text = "Ошибка: минимальное время аренды — 20 минут";
+                return;
+            }
+
+            // Получаем ID автомобиля
+            int carId = (int)cmbCarForBooking.SelectedValue;
+
+            // Рассчитываем стоимость
+            decimal totalPrice = CalculateRentalCost(carId, startDateTime.Value, endDateTime.Value);
+
+            // Выводим в поле
+            txtTotalPrice.Text = totalPrice.ToString("F2") + " ₽";
+        }
+        /// <summary>
+        /// Пересчёт стоимости при изменении даты и времени начала аренды
+        /// </summary>
+        private void DpStartDateTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            RecalculateTotalPrice();
+        }
+
+        /// <summary>
+        /// Пересчёт стоимости при изменении даты и времени окончания аренды
+        /// </summary>
+        private void DpEndDateTime_ValueChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            RecalculateTotalPrice();
+        }
+
+        /// <summary>
+        /// Пересчёт стоимости при выборе другого автомобиля
+        /// </summary>
+        private void CmbCarForBooking_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            RecalculateTotalPrice();
+        }
 
         private void BtnAddBooking_Click(object sender, RoutedEventArgs e)
         {
@@ -498,6 +630,15 @@ namespace CarRentals
                 return;
             }
 
+            // Проверка: минимальная длительность 20 минут
+            TimeSpan duration = endDate - startDate;
+            if (duration.TotalMinutes < 20)
+            {
+                MessageBox.Show("Минимальное время аренды — 20 минут. Выберите больший интервал.",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
             int carId = (int)cmbCarForBooking.SelectedValue;
 
             // НОВАЯ ПРОВЕРКА: свободен ли автомобиль на выбранное время
@@ -511,13 +652,24 @@ namespace CarRentals
                 return;
             }
 
+            // Рассчитываем стоимость
+            decimal totalPrice = CalculateRentalCost(carId, startDate, endDate);
+
+            // Если расчёт вернул 0 из-за ошибки валидации — прерываем
+            if (totalPrice == 0 && duration.TotalMinutes >= 30)
+            {
+                MessageBox.Show("Не удалось рассчитать стоимость. Проверьте цены автомобиля.",
+                                "Ошибка", MessageBoxButton.OK, MessageBoxImage.Error);
+                return;
+            }
+
             var booking = new Booking
                 {
                     UserId = (int)cmbUserForBooking.SelectedValue,
                     CarId = (int)cmbCarForBooking.SelectedValue,
                     StartDateTime = dpStartDateTime.Value ?? DateTime.Now,
                     EndDateTime = dpEndDateTime.Value ?? DateTime.Now,
-                    TotalPrice = decimal.TryParse(txtTotalPrice.Text, out decimal price) ? price : 0,
+                    TotalPrice = totalPrice,
                     StatusBooking = (BookingStatus)cmbBookingStatus.SelectedIndex,
                     Mileage = int.TryParse(txtMileage.Text, out int mileage) ? mileage : null,
                 };
@@ -554,6 +706,13 @@ namespace CarRentals
                     MessageBox.Show("Дата окончания должна быть позже даты начала");
                     return;
                 }
+                // Проверка: минимальная длительность 20 минут
+                TimeSpan duration = endDate - startDate;
+                if (duration.TotalMinutes < 20)
+                {
+                    MessageBox.Show("Минимальное время аренды — 20 минут. Выберите больший интервал.");
+                    return;
+                }
 
                 // свободен ли автомобиль на выбранное время(исключая текущее бронирование)
                 if (!IsCarAvailableForBooking(newCarId, startDate, endDate, selected.BookingId))
@@ -568,7 +727,7 @@ namespace CarRentals
 
                 selected.StartDateTime = dpStartDateTime.Value ?? DateTime.Now;
                 selected.EndDateTime = dpEndDateTime.Value ?? DateTime.Now;
-                selected.TotalPrice = decimal.TryParse(txtTotalPrice.Text, out decimal price) ? price : 0;
+                selected.TotalPrice = CalculateRentalCost(newCarId, startDate, endDate);
                 selected.StatusBooking = (BookingStatus)cmbBookingStatus.SelectedIndex;
                 selected.Mileage = int.TryParse(txtMileage.Text, out int mileage) ? mileage : null;
 
@@ -601,6 +760,17 @@ namespace CarRentals
         {
             if (lstBookings.SelectedItem is Booking selected)
             {
+                // Проверяем наличие связанных штрафов
+                var hasFines = db.Fines.Any(f => f.BookingId == selected.BookingId);
+
+                if (hasFines)
+                {
+                    MessageBox.Show($"Невозможно удалить бронирование #{selected.BookingId}.\n" +
+                                   "Сначала удалите все связанные с ним штрафы.",
+                                   "Ошибка удаления", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 if (MessageBox.Show($"Удалить бронирование #{selected.BookingId}?", "Подтверждение", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                 {
                     db.Bookings.Remove(selected);
@@ -632,7 +802,7 @@ namespace CarRentals
             db.Fines.Include(f => f.Booking).ThenInclude(b => b.Car).Load();
             lstFines.ItemsSource = db.Fines.Local.ToObservableCollection();
 
-            lstFines.DisplayMemberPath = "FineType";
+            lstFines.DisplayMemberPath = "DisplayName";
             LoadComboBoxesForFines();
         }
 
@@ -689,7 +859,8 @@ namespace CarRentals
         /// Проверяет, находится ли дата штрафа в пределах периода бронирования (с учётом времени)
         /// </summary>
         
-        private bool IsFineDateWithinBookingPeriod(DateTime fineDate, DateTime bookingStart, DateTime bookingEnd)
+        private bool IsFineDateWithinBookingPeriod(DateTime fineDate, 
+            DateTime bookingStart, DateTime bookingEnd)
         {
             // Штраф должен быть выписан в период с начала до окончания бронирования (включительно)
             return fineDate >= bookingStart && fineDate <= bookingEnd;
@@ -730,7 +901,6 @@ namespace CarRentals
                     MessageBoxImage.Warning);
                 return;
             }
-
 
             if (paymentDate.HasValue && paymentDate.Value.Date < issueDate.Date)
             {
